@@ -66,10 +66,16 @@ def fetch_timestamp() -> str:
         soup = BeautifulSoup(resp.text, "lxml")
         for tag in soup.find_all(string=True):
             if "Last Updated" in tag:
+                # The time value may live in a sibling/child element — grab the
+                # full text of the nearest block ancestor to get the complete string
+                parent = tag.parent
+                full_text = parent.get_text(" ", strip=True)
+                if len(full_text) > len(tag.strip()):
+                    return full_text
                 return tag.strip()
     except Exception:
         pass
-    return datetime.now().strftime("Fetched at %I:%M %p on %d/%m/%Y")
+    return datetime.now().strftime("Last Updated at %I:%M %p on %d/%m/%Y")
 
 
 def fetch_all_results() -> dict:
