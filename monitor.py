@@ -4,6 +4,9 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from scraper import fetch_all_results
 from notifier import send_alert
 

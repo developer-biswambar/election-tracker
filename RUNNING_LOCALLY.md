@@ -75,7 +75,6 @@ RECIPIENT_EMAILS=biswambarp43@gmail.com,friend@example.com
 
 ```bash
 source venv/bin/activate   # skip if already active
-export $(cat .env | xargs)
 python monitor.py
 ```
 
