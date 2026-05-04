@@ -13,13 +13,30 @@ STATES = {
 }
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Referer": f"https://results.eci.gov.in/ResultAcGenMay2026/index.htm",
+    "Connection": "keep-alive",
+    "Upgrade-Insecure-Requests": "1",
 }
+
+# Use a session so cookies are shared across requests (site may set a session cookie on index)
+_session = requests.Session()
+_session.headers.update(HEADERS)
+
+
+def _warm_up_session() -> None:
+    try:
+        _session.get(f"{BASE_URL}/index.htm", timeout=30)
+    except Exception:
+        pass
 
 
 def fetch_state_results(state_code: str) -> list[dict]:
     url = f"{BASE_URL}/partywiseresult-{state_code}.htm"
-    resp = requests.get(url, headers=HEADERS, timeout=30)
+    resp = _session.get(url, timeout=30)
     resp.raise_for_status()
 
     soup = BeautifulSoup(resp.text, "lxml")
@@ -51,7 +68,7 @@ def fetch_state_results(state_code: str) -> list[dict]:
 def fetch_timestamp() -> str:
     url = f"{BASE_URL}/index.htm"
     try:
-        resp = requests.get(url, headers=HEADERS, timeout=30)
+        resp = _session.get(url, timeout=30)
         soup = BeautifulSoup(resp.text, "lxml")
         for tag in soup.find_all(string=True):
             if "Last Updated" in tag:
@@ -62,6 +79,7 @@ def fetch_timestamp() -> str:
 
 
 def fetch_all_results() -> dict:
+    _warm_up_session()
     results = {}
     for state_name, state_code in STATES.items():
         try:
