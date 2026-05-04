@@ -140,6 +140,17 @@ def _build_state_block(state: str, parties: list[dict]) -> str:
           </div>
         </div>"""
 
+    col_header = """
+    <div class="party-row" style="padding:6px 16px;background:#F8FAFC;border-bottom:1px solid #E2E8F0">
+      <span class="rank"></span>
+      <span style="min-width:44px"></span>
+      <div class="bar-col"></div>
+      <div class="counts">
+        <span style="min-width:32px;text-align:center;font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:.5px">Won</span>
+        <span style="min-width:32px;text-align:center;font-size:10px;font-weight:700;color:#1E40AF;text-transform:uppercase;letter-spacing:.5px">Leading</span>
+      </div>
+    </div>"""
+
     return f"""
     <div class="state-block">
       <div class="state-head">
@@ -147,10 +158,8 @@ def _build_state_block(state: str, parties: list[dict]) -> str:
         <div class="state-meta">{counted} of {total_seats} seats counted ({pct}%)</div>
         <div class="track"><div class="track-fill" style="width:{pct}%"></div></div>
       </div>
+      {col_header}
       {rows}
-      <div class="legend">
-        <span><b style="color:#166534">Won</b> &nbsp;·&nbsp; <b style="color:#1E40AF">Leading</b></span>
-      </div>
     </div>"""
 
 
