@@ -8,10 +8,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from scraper import fetch_all_results
-from notifier import send_alert
+from notifier import send_alert, send_digest
 
 SNAPSHOT_PATH = Path(os.environ.get("SNAPSHOT_PATH", "./data/snapshot.json"))
 CHECK_INTERVAL = int(os.environ.get("CHECK_INTERVAL_SECONDS", 300))
+
+# Set to 0 to disable periodic digests
+DIGEST_INTERVAL = int(os.environ.get("DIGEST_INTERVAL_SECONDS", 600))
 
 
 def load_snapshot() -> dict | None:
@@ -47,38 +50,56 @@ def compute_changes(old: dict, new: dict) -> list[dict]:
     return changes
 
 
-def run_once() -> None:
+def run_once(last_digest_at: float) -> float:
+    """Returns updated last_digest_at timestamp."""
     print(f"[monitor] Fetching results at {datetime.now().strftime('%H:%M:%S')}...")
     try:
         new_data = fetch_all_results()
     except Exception as e:
         print(f"[monitor] Fetch failed: {e}")
-        return
+        return last_digest_at
 
     old_data = load_snapshot()
 
     if old_data is None:
         print("[monitor] No snapshot found — saving baseline, no email sent.")
         save_snapshot(new_data)
-        return
+        return last_digest_at
 
     changes = compute_changes(old_data, new_data)
 
     if changes:
-        print(f"[monitor] {len(changes)} change(s) detected — sending email.")
+        print(f"[monitor] {len(changes)} change(s) detected — sending alert.")
         try:
             send_alert(new_data, changes)
         except Exception as e:
-            print(f"[monitor] Email failed: {e}")
+            print(f"[monitor] Alert email failed: {e}")
         save_snapshot(new_data)
     else:
         print("[monitor] No changes detected.")
 
+    if DIGEST_INTERVAL > 0 and (time.time() - last_digest_at) >= DIGEST_INTERVAL:
+        print("[monitor] Sending periodic digest.")
+        try:
+            send_digest(new_data)
+            last_digest_at = time.time()
+        except Exception as e:
+            print(f"[monitor] Digest email failed: {e}")
+
+    return last_digest_at
+
 
 def main() -> None:
     print(f"[monitor] Starting. Checking every {CHECK_INTERVAL}s.")
+    if DIGEST_INTERVAL > 0:
+        print(f"[monitor] Periodic digest every {DIGEST_INTERVAL}s.")
+    else:
+        print("[monitor] Periodic digest disabled (DIGEST_INTERVAL_SECONDS=0).")
+
+    last_digest_at = 0.0  # send first digest on the second check (after baseline is set)
+
     while True:
-        run_once()
+        last_digest_at = run_once(last_digest_at)
         time.sleep(CHECK_INTERVAL)
 
 

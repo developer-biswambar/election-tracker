@@ -94,22 +94,7 @@ def _build_full_results_html(data: dict) -> str:
     return html
 
 
-def send_alert(new_data: dict, changes: list[dict]) -> None:
-    subject = f"[Election Alert] Results updated — {new_data.get('timestamp', '')}"
-
-    body = f"""
-    <html><body style="font-family:sans-serif;max-width:800px;margin:auto;padding:20px">
-      <h1 style="color:#0f172a">ECI Election Results Update</h1>
-      <p>The election results page has been updated. Below are the changes and the full current snapshot.</p>
-      {_build_diff_html(changes)}
-      <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0">
-      {_build_full_results_html(new_data)}
-      <p style="color:#94a3b8;font-size:12px;margin-top:32px">
-        Source: <a href="https://results.eci.gov.in/ResultAcGenMay2026/index.htm">ECI Results Page</a>
-      </p>
-    </body></html>
-    """
-
+def _send(subject: str, body: str) -> None:
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = GMAIL_USER
@@ -121,3 +106,37 @@ def send_alert(new_data: dict, changes: list[dict]) -> None:
         server.sendmail(GMAIL_USER, RECIPIENTS, msg.as_string())
 
     print(f"[notifier] Email sent to: {', '.join(RECIPIENTS)}")
+
+
+def _base_html(title: str, subtitle: str, content: str) -> str:
+    return f"""
+    <html><body style="font-family:sans-serif;max-width:800px;margin:auto;padding:20px">
+      <h1 style="color:#0f172a">{title}</h1>
+      <p>{subtitle}</p>
+      {content}
+      <p style="color:#94a3b8;font-size:12px;margin-top:32px">
+        Source: <a href="https://results.eci.gov.in/ResultAcGenMay2026/index.htm">ECI Results Page</a>
+      </p>
+    </body></html>
+    """
+
+
+def send_alert(new_data: dict, changes: list[dict]) -> None:
+    subject = f"[Election Alert] Results updated — {new_data.get('timestamp', '')}"
+    content = _build_diff_html(changes) + f'<hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0">' + _build_full_results_html(new_data)
+    body = _base_html(
+        "ECI Election Results Update",
+        "The election results page has been updated. Below are the changes and the full current snapshot.",
+        content,
+    )
+    _send(subject, body)
+
+
+def send_digest(data: dict) -> None:
+    subject = f"[Election Digest] Current results — {data.get('timestamp', '')}"
+    body = _base_html(
+        "ECI Election Results — Periodic Digest",
+        "Here is the current snapshot of all results.",
+        _build_full_results_html(data),
+    )
+    _send(subject, body)
