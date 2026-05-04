@@ -9,6 +9,7 @@ load_dotenv()
 
 from scraper import fetch_all_results
 from notifier import send_alert, send_digest
+from whatsapp import send_whatsapp_alert, send_whatsapp_digest
 
 SNAPSHOT_PATH = Path(os.environ.get("SNAPSHOT_PATH", "./data/snapshot.json"))
 CHECK_INTERVAL = int(os.environ.get("CHECK_INTERVAL_SECONDS", 300))
@@ -74,6 +75,10 @@ def run_once(last_digest_at: float) -> float:
             send_alert(new_data, changes)
         except Exception as e:
             print(f"[monitor] Alert email failed: {e}")
+        try:
+            send_whatsapp_alert(new_data, changes)
+        except Exception as e:
+            print(f"[monitor] Alert WhatsApp failed: {e}")
         save_snapshot(new_data)
     else:
         print("[monitor] No changes detected.")
@@ -82,9 +87,13 @@ def run_once(last_digest_at: float) -> float:
         print("[monitor] Sending periodic digest.")
         try:
             send_digest(new_data)
-            last_digest_at = time.time()
         except Exception as e:
             print(f"[monitor] Digest email failed: {e}")
+        try:
+            send_whatsapp_digest(new_data)
+            last_digest_at = time.time()
+        except Exception as e:
+            print(f"[monitor] Digest WhatsApp failed: {e}")
 
     return last_digest_at
 
