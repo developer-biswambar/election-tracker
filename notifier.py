@@ -242,7 +242,8 @@ def _send(subject: str, html_content: str) -> None:
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = GMAIL_USER
-    msg["To"] = ", ".join(RECIPIENTS)
+    msg["To"] = GMAIL_USER
+    msg["Bcc"] = ", ".join(RECIPIENTS)
     msg.attach(MIMEText(body, "html"))
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
