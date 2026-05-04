@@ -3,6 +3,8 @@ services:
     build: .
     restart: unless-stopped
     env_file: .env
+    environment:
+      - SNAPSHOT_PATH=/data/snapshot.json
     volumes:
       - election-data:/data
 

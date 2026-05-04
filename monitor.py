@@ -10,7 +10,7 @@ load_dotenv()
 from scraper import fetch_all_results
 from notifier import send_alert
 
-SNAPSHOT_PATH = Path(os.environ.get("SNAPSHOT_PATH", "/data/snapshot.json"))
+SNAPSHOT_PATH = Path(os.environ.get("SNAPSHOT_PATH", "./data/snapshot.json"))
 CHECK_INTERVAL = int(os.environ.get("CHECK_INTERVAL_SECONDS", 300))
 
 

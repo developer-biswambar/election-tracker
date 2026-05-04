@@ -1,4 +1,4 @@
-import requests
+from curl_cffi.requests import Session
 from bs4 import BeautifulSoup
 from datetime import datetime
 
@@ -12,19 +12,9 @@ STATES = {
     "West Bengal": "S25",
 }
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Accept-Encoding": "gzip, deflate, br",
-    "Referer": f"https://results.eci.gov.in/ResultAcGenMay2026/index.htm",
-    "Connection": "keep-alive",
-    "Upgrade-Insecure-Requests": "1",
-}
-
-# Use a session so cookies are shared across requests (site may set a session cookie on index)
-_session = requests.Session()
-_session.headers.update(HEADERS)
+# impersonate= makes curl_cffi mimic Chrome's TLS fingerprint, which defeats
+# fingerprint-based blocking that ignores plain User-Agent spoofing
+_session = Session(impersonate="chrome124")
 
 
 def _warm_up_session() -> None:
@@ -36,7 +26,11 @@ def _warm_up_session() -> None:
 
 def fetch_state_results(state_code: str) -> list[dict]:
     url = f"{BASE_URL}/partywiseresult-{state_code}.htm"
-    resp = _session.get(url, timeout=30)
+    resp = _session.get(
+        url,
+        headers={"Referer": f"{BASE_URL}/index.htm"},
+        timeout=30,
+    )
     resp.raise_for_status()
 
     soup = BeautifulSoup(resp.text, "lxml")
