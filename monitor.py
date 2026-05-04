@@ -13,9 +13,10 @@ from whatsapp import send_whatsapp_alert, send_whatsapp_digest
 
 SNAPSHOT_PATH = Path(os.environ.get("SNAPSHOT_PATH", "./data/snapshot.json"))
 CHECK_INTERVAL = int(os.environ.get("CHECK_INTERVAL_SECONDS", 300))
-
-# Set to 0 to disable periodic digests
 DIGEST_INTERVAL = int(os.environ.get("DIGEST_INTERVAL_SECONDS", 600))
+
+ENABLE_EMAIL     = os.environ.get("ENABLE_EMAIL", "true").lower() != "false"
+ENABLE_WHATSAPP  = os.environ.get("ENABLE_WHATSAPP", "true").lower() != "false"
 
 
 def load_snapshot() -> dict | None:
@@ -71,39 +72,40 @@ def run_once(last_digest_at: float) -> float:
 
     if changes:
         print(f"[monitor] {len(changes)} change(s) detected — sending alert.")
-        try:
-            send_alert(new_data, changes)
-        except Exception as e:
-            print(f"[monitor] Alert email failed: {e}")
-        try:
-            send_whatsapp_alert(new_data, changes)
-        except Exception as e:
-            print(f"[monitor] Alert WhatsApp failed: {e}")
+        if ENABLE_EMAIL:
+            try:
+                send_alert(new_data, changes)
+            except Exception as e:
+                print(f"[monitor] Alert email failed: {e}")
+        if ENABLE_WHATSAPP:
+            try:
+                send_whatsapp_alert(new_data, changes)
+            except Exception as e:
+                print(f"[monitor] Alert WhatsApp failed: {e}")
         save_snapshot(new_data)
     else:
         print("[monitor] No changes detected.")
 
     if DIGEST_INTERVAL > 0 and (time.time() - last_digest_at) >= DIGEST_INTERVAL:
         print("[monitor] Sending periodic digest.")
-        try:
-            send_digest(new_data)
-        except Exception as e:
-            print(f"[monitor] Digest email failed: {e}")
-        try:
-            send_whatsapp_digest(new_data)
-            last_digest_at = time.time()
-        except Exception as e:
-            print(f"[monitor] Digest WhatsApp failed: {e}")
+        if ENABLE_EMAIL:
+            try:
+                send_digest(new_data)
+            except Exception as e:
+                print(f"[monitor] Digest email failed: {e}")
+        if ENABLE_WHATSAPP:
+            try:
+                send_whatsapp_digest(new_data)
+            except Exception as e:
+                print(f"[monitor] Digest WhatsApp failed: {e}")
+        last_digest_at = time.time()
 
     return last_digest_at
 
 
 def main() -> None:
     print(f"[monitor] Starting. Checking every {CHECK_INTERVAL}s.")
-    if DIGEST_INTERVAL > 0:
-        print(f"[monitor] Periodic digest every {DIGEST_INTERVAL}s.")
-    else:
-        print("[monitor] Periodic digest disabled (DIGEST_INTERVAL_SECONDS=0).")
+    print(f"[monitor] Email: {'on' if ENABLE_EMAIL else 'off'}  |  WhatsApp: {'on' if ENABLE_WHATSAPP else 'off'}  |  Digest: {'every ' + str(DIGEST_INTERVAL) + 's' if DIGEST_INTERVAL > 0 else 'off'}")
 
     last_digest_at = 0.0  # send first digest on the second check (after baseline is set)
 
