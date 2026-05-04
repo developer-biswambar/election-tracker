@@ -37,65 +37,64 @@ PARTY_COLORS = {
 
 STYLES = """
 <style>
-  * { box-sizing: border-box; }
   body { margin:0; padding:0; background:#F1F5F9; font-family:Arial,sans-serif; color:#1E293B; }
-  .wrapper { max-width:600px; margin:0 auto; padding:20px 16px; }
+  .wrapper { max-width:680px; margin:0 auto; padding:16px; }
 
-  .header { background:#1A237E; border-radius:10px; padding:28px 24px;
-            margin-bottom:20px; text-align:center; }
-  .header h1 { color:#fff; margin:0 0 6px; font-size:20px; }
-  .header .sub { color:rgba(255,255,255,.7); font-size:13px; margin:0; }
-  .header .ts  { display:inline-block; margin-top:12px; background:rgba(255,255,255,.15);
-                 color:#fff; border-radius:20px; padding:4px 16px; font-size:12px; }
+  .header { background:#1A237E; border-radius:10px; padding:24px;
+            margin-bottom:16px; text-align:center; }
+  .header h1  { color:#fff; margin:0 0 4px; font-size:19px; }
+  .header .sub { color:rgba(255,255,255,.7); font-size:12px; margin:0; }
+  .header .ts  { display:inline-block; margin-top:10px; background:rgba(255,255,255,.15);
+                 color:#fff; border-radius:20px; padding:3px 14px; font-size:11px; }
 
-  .state-block { background:#fff; border-radius:10px; margin-bottom:16px;
-                 box-shadow:0 1px 4px rgba(0,0,0,.08); overflow:hidden; }
-  .state-head  { padding:14px 16px 10px; border-bottom:1px solid #F1F5F9; }
-  .state-head h2 { margin:0 0 4px; font-size:15px; font-weight:700; }
-  .state-meta  { font-size:12px; color:#94A3B8; }
-  .track       { background:#E2E8F0; border-radius:3px; height:4px; margin-top:8px; }
-  .track-fill  { height:4px; border-radius:3px; background:#6366F1; }
+  .section-label { font-size:10px; font-weight:700; color:#94A3B8; text-transform:uppercase;
+                   letter-spacing:.8px; margin:0 0 8px; }
 
-  .party-row   { display:flex; align-items:center; padding:10px 16px;
-                 border-bottom:1px solid #F8FAFC; gap:10px; }
-  .party-row:last-child { border-bottom:none; }
-  .rank        { font-size:12px; font-weight:700; color:#94A3B8; width:18px;
-                 text-align:center; flex-shrink:0; }
-  .party-pill  { font-size:11px; font-weight:700; color:#fff; border-radius:4px;
-                 padding:3px 8px; white-space:nowrap; flex-shrink:0; min-width:44px;
-                 text-align:center; }
-  .bar-col     { flex:1; }
-  .bar-bg      { background:#F1F5F9; border-radius:3px; height:10px; overflow:hidden; }
-  .bar-fill    { height:10px; border-radius:3px; }
-  .counts      { display:flex; gap:6px; flex-shrink:0; align-items:center; }
-  .w           { background:#DCFCE7; color:#166534; border-radius:4px;
-                 padding:2px 8px; font-size:12px; font-weight:700; min-width:32px;
-                 text-align:center; }
-  .l           { background:#DBEAFE; color:#1E40AF; border-radius:4px;
-                 padding:2px 8px; font-size:12px; font-weight:700; min-width:32px;
-                 text-align:center; }
-  .legend      { display:flex; gap:12px; padding:8px 16px; background:#F8FAFC;
-                 border-top:1px solid #F1F5F9; }
-  .legend span { font-size:11px; color:#64748B; }
+  /* state card rendered as an HTML table cell — styles apply inside each cell */
+  .sc { background:#fff; border-radius:8px; box-shadow:0 1px 4px rgba(0,0,0,.08);
+        overflow:hidden; vertical-align:top; }
+  .sh { padding:10px 12px 8px; border-bottom:1px solid #F1F5F9; }
+  .sh h2 { margin:0 0 2px; font-size:13px; font-weight:700; }
+  .sh .sm { font-size:10px; color:#94A3B8; }
+  .trk { background:#E2E8F0; border-radius:3px; height:3px; margin-top:6px; }
+  .trf { height:3px; border-radius:3px; background:#6366F1; }
 
-  .change-block { background:#fff; border-radius:10px; margin-bottom:16px;
+  /* column header row inside each card */
+  .ch { background:#F8FAFC; border-bottom:1px solid #E2E8F0; }
+  .ch td { padding:4px 8px; font-size:9px; font-weight:700; text-transform:uppercase;
+           letter-spacing:.5px; color:#94A3B8; }
+  .ch td.cw { color:#166534; text-align:center; }
+  .ch td.cl { color:#1E40AF; text-align:center; }
+
+  /* party rows */
+  .pr td { padding:5px 8px; font-size:11px; border-bottom:1px solid #F8FAFC;
+           vertical-align:middle; }
+  .pr:last-child td { border-bottom:none; }
+  .rk { color:#CBD5E1; font-size:10px; font-weight:700; text-align:center; width:14px; }
+  .pp { border-radius:3px; color:#fff; font-size:9px; font-weight:700;
+        padding:2px 5px; white-space:nowrap; text-align:center; }
+  .bar-td { width:35%; }
+  .bb { background:#F1F5F9; border-radius:2px; height:7px; overflow:hidden; }
+  .bf { height:7px; border-radius:2px; }
+  .wn { background:#DCFCE7; color:#166534; border-radius:3px; padding:1px 5px;
+        font-size:10px; font-weight:700; text-align:center; display:block; }
+  .ld { background:#DBEAFE; color:#1E40AF; border-radius:3px; padding:1px 5px;
+        font-size:10px; font-weight:700; text-align:center; display:block; }
+
+  /* change block */
+  .change-block { background:#fff; border-radius:8px; margin-bottom:12px;
                   box-shadow:0 1px 4px rgba(0,0,0,.08); overflow:hidden; }
-  .change-head  { padding:12px 16px; background:#FFF7ED; border-bottom:1px solid #FED7AA;
-                  font-size:13px; font-weight:700; color:#92400E; }
-  .change-row   { display:flex; align-items:center; padding:10px 16px;
-                  border-bottom:1px solid #F8FAFC; gap:10px; }
-  .change-row:last-child { border-bottom:none; }
-  .c-state      { font-size:11px; color:#94A3B8; width:80px; flex-shrink:0; }
-  .c-party      { flex:1; font-size:13px; font-weight:600; }
-  .c-nums       { display:flex; gap:6px; }
-  .up           { color:#16A34A; font-weight:700; font-size:13px; }
-  .dn           { color:#DC2626; font-weight:700; font-size:13px; }
-  .nc           { color:#CBD5E1; font-size:13px; }
+  .change-head  { padding:10px 14px; background:#FFF7ED; border-bottom:1px solid #FED7AA;
+                  font-size:12px; font-weight:700; color:#92400E; }
+  .cr td { padding:7px 14px; font-size:12px; border-bottom:1px solid #F8FAFC;
+           vertical-align:middle; }
+  .cr:last-child td { border-bottom:none; }
+  .up { color:#16A34A; font-weight:700; }
+  .dn { color:#DC2626; font-weight:700; }
+  .nc { color:#CBD5E1; }
 
-  .divider { border:none; border-top:1px solid #E2E8F0; margin:20px 0; }
-  .section-label { font-size:11px; font-weight:700; color:#94A3B8; text-transform:uppercase;
-                   letter-spacing:.8px; margin:0 0 10px; }
-  .footer { text-align:center; padding:16px 0 4px; font-size:12px; color:#94A3B8; }
+  .divider { border:none; border-top:1px solid #E2E8F0; margin:14px 0; }
+  .footer { text-align:center; padding:12px 0 4px; font-size:11px; color:#94A3B8; }
   .footer a { color:#6366F1; text-decoration:none; }
 </style>
 """
@@ -112,7 +111,8 @@ def _abbr(name: str) -> str:
     return name.split(" - ")[-1].strip() if " - " in name else name[:6]
 
 
-def _build_state_block(state: str, parties: list[dict]) -> str:
+def _state_card(state: str, parties: list[dict]) -> str:
+    """Returns the inner HTML for one state card (to be placed in a <td class='sc'>)."""
     if not parties:
         return ""
     total_seats = STATE_TOTALS.get(state, 1)
@@ -123,57 +123,61 @@ def _build_state_block(state: str, parties: list[dict]) -> str:
     rows = ""
     for i, p in enumerate(parties, 1):
         color = _party_color(p["party"])
-        abbr = _abbr(p["party"])
         bar_w = int(p["total"] / max_seats * 100)
         rows += f"""
-        <div class="party-row">
-          <span class="rank">{i}</span>
-          <span class="party-pill" style="background:{color}">{abbr}</span>
-          <div class="bar-col">
-            <div class="bar-bg">
-              <div class="bar-fill" style="width:{bar_w}%;background:{color}55"></div>
-            </div>
-          </div>
-          <div class="counts">
-            <span class="w">{p['won']}</span>
-            <span class="l">{p['leading']}</span>
-          </div>
-        </div>"""
-
-    col_header = """
-    <div class="party-row" style="padding:6px 16px;background:#F8FAFC;border-bottom:1px solid #E2E8F0">
-      <span class="rank"></span>
-      <span style="min-width:44px"></span>
-      <div class="bar-col"></div>
-      <div class="counts">
-        <span style="min-width:32px;text-align:center;font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:.5px">Won</span>
-        <span style="min-width:32px;text-align:center;font-size:10px;font-weight:700;color:#1E40AF;text-transform:uppercase;letter-spacing:.5px">Leading</span>
-      </div>
-    </div>"""
+        <tr class="pr">
+          <td class="rk">{i}</td>
+          <td><span class="pp" style="background:{color}">{_abbr(p['party'])}</span></td>
+          <td class="bar-td"><div class="bb"><div class="bf" style="width:{bar_w}%;background:{color}66"></div></div></td>
+          <td><span class="wn">{p['won']}</span></td>
+          <td><span class="ld">{p['leading']}</span></td>
+        </tr>"""
 
     return f"""
-    <div class="state-block">
-      <div class="state-head">
-        <h2>{state}</h2>
-        <div class="state-meta">{counted} of {total_seats} seats counted ({pct}%)</div>
-        <div class="track"><div class="track-fill" style="width:{pct}%"></div></div>
-      </div>
-      {col_header}
+    <div class="sh">
+      <h2>{state}</h2>
+      <div class="sm">{counted} / {total_seats} seats &nbsp;({pct}%)</div>
+      <div class="trk"><div class="trf" style="width:{pct}%"></div></div>
+    </div>
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
+      <tr class="ch">
+        <td colspan="3"></td>
+        <td class="cw">Won</td>
+        <td class="cl">Leading</td>
+      </tr>
       {rows}
-    </div>"""
+    </table>"""
 
 
 def _build_results_html(data: dict) -> str:
-    blocks = "".join(
-        _build_state_block(state, parties)
-        for state, parties in data.get("states", {}).items()
-        if parties
-    )
+    states = [(s, p) for s, p in data.get("states", {}).items() if p]
+    # Pair states into rows of 2
+    grid_rows = ""
+    for i in range(0, len(states), 2):
+        left_state, left_parties = states[i]
+        left_html = _state_card(left_state, left_parties)
+
+        if i + 1 < len(states):
+            right_state, right_parties = states[i + 1]
+            right_html = _state_card(right_state, right_parties)
+            right_cell = f'<td width="8"></td><td class="sc" width="49%">{right_html}</td>'
+        else:
+            right_cell = '<td width="8"></td><td width="49%"></td>'
+
+        grid_rows += f"""
+        <tr>
+          <td class="sc" width="49%">{left_html}</td>
+          {right_cell}
+        </tr>
+        <tr><td colspan="3" height="10"></td></tr>"""
+
     ts = data.get("timestamp", "")
     return f"""
     <p class="section-label">State-wise Results</p>
-    {blocks}
-    <p style="font-size:11px;color:#CBD5E1;margin-top:4px">{ts}</p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
+      {grid_rows}
+    </table>
+    <p style="font-size:10px;color:#CBD5E1;margin-top:4px">{ts}</p>
     """
 
 
@@ -186,27 +190,25 @@ def _build_diff_html(changes: list[dict]) -> str:
         def cell(old, new, label):
             if old == new:
                 return f'<span class="nc">{label} {new}</span>'
-            arrow = "▲" if new > old else "▼"
-            cls = "up" if new > old else "dn"
+            arrow, cls = ("▲", "up") if new > old else ("▼", "dn")
             return f'<span class="{cls}">{label} {new} {arrow}{abs(new - old)}</span>'
 
         color = _party_color(c["party"])
-        abbr = _abbr(c["party"])
         rows += f"""
-        <div class="change-row">
-          <span class="c-state">{c['state']}</span>
-          <span class="party-pill" style="background:{color};font-size:10px">{abbr}</span>
-          <span class="c-party">{c['party'].split(' - ')[0] if ' - ' in c['party'] else c['party']}</span>
-          <div class="c-nums">
-            {cell(c['old'].get('won',0),     c['new'].get('won',0),     'W')}
-            {cell(c['old'].get('leading',0), c['new'].get('leading',0), 'L')}
-          </div>
-        </div>"""
+        <tr class="cr">
+          <td style="color:#94A3B8;font-size:11px;white-space:nowrap">{c['state']}</td>
+          <td><span class="pp" style="background:{color}">{_abbr(c['party'])}</span></td>
+          <td style="font-size:12px;font-weight:600">{c['party'].split(' - ')[0] if ' - ' in c['party'] else c['party']}</td>
+          <td style="white-space:nowrap">{cell(c['old'].get('won',0), c['new'].get('won',0), 'W')}</td>
+          <td style="white-space:nowrap">{cell(c['old'].get('leading',0), c['new'].get('leading',0), 'L')}</td>
+        </tr>"""
 
     return f"""
     <div class="change-block">
       <div class="change-head">&#128308; What changed</div>
-      {rows}
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
+        {rows}
+      </table>
     </div>
     <hr class="divider">
     """
