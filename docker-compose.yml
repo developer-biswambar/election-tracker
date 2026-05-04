@@ -1,0 +1,10 @@
+services:
+  election-monitor:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - election-data:/data
+
+volumes:
+  election-data:
