@@ -8,7 +8,6 @@ GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
 
 RECIPIENTS = [e.strip() for e in os.environ.get("RECIPIENT_EMAILS", GMAIL_USER).split(",") if e.strip()]
 
-# Total assembly constituencies per state
 STATE_TOTALS = {
     "Assam": 126,
     "Kerala": 140,
@@ -17,269 +16,155 @@ STATE_TOTALS = {
     "West Bengal": 294,
 }
 
-# Rough party colour map (fallback to grey)
 PARTY_COLORS = {
-    "BJP": "#FF6B00",
-    "INC": "#19AAED",
-    "AITC": "#20C997",
-    "DMK": "#CC0000",
-    "ADMK": "#006400",
-    "TVK": "#8B0000",
+    "BJP":    "#FF6B00",
+    "INC":    "#19AAED",
+    "AITC":   "#20C997",
+    "DMK":    "#E63946",
+    "ADMK":   "#2D6A4F",
+    "TVK":    "#7B2D8B",
     "CPI(M)": "#CC0000",
-    "CPI": "#E63946",
-    "IUML": "#1B4332",
-    "PMK": "#6A4C93",
-    "AINRC": "#F4A261",
-    "AGP": "#2D6A4F",
-    "BOPF": "#457B9D",
-    "AIUDF": "#023E8A",
-    "VCK": "#370617",
-    "BGPM": "#1D3557",
+    "CPI":    "#FF4444",
+    "IUML":   "#1B4332",
+    "PMK":    "#6A4C93",
+    "AINRC":  "#F4A261",
+    "AGP":    "#457B9D",
+    "BOPF":   "#457B9D",
+    "AIUDF":  "#023E8A",
+    "VCK":    "#370617",
+    "BGPM":   "#1D3557",
 }
 
 STYLES = """
 <style>
-  body { margin:0; padding:0; background:#F0F4F8; font-family:'Segoe UI',Arial,sans-serif; }
-  .wrapper { max-width:680px; margin:0 auto; background:#F0F4F8; padding:24px 16px; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:0; background:#F1F5F9; font-family:Arial,sans-serif; color:#1E293B; }
+  .wrapper { max-width:600px; margin:0 auto; padding:20px 16px; }
 
-  /* Header */
-  .header { background:linear-gradient(135deg,#1A237E 0%,#283593 60%,#FF6F00 100%);
-            border-radius:12px; padding:32px 28px; margin-bottom:24px; text-align:center; }
-  .header h1 { color:#fff; margin:0 0 4px; font-size:22px; letter-spacing:.4px; }
-  .header p  { color:rgba(255,255,255,.8); margin:0; font-size:13px; }
-  .badge { display:inline-block; background:rgba(255,255,255,.18); color:#fff;
-           border-radius:20px; padding:4px 14px; font-size:12px; margin-top:10px; }
+  .header { background:#1A237E; border-radius:10px; padding:28px 24px;
+            margin-bottom:20px; text-align:center; }
+  .header h1 { color:#fff; margin:0 0 6px; font-size:20px; }
+  .header .sub { color:rgba(255,255,255,.7); font-size:13px; margin:0; }
+  .header .ts  { display:inline-block; margin-top:12px; background:rgba(255,255,255,.15);
+                 color:#fff; border-radius:20px; padding:4px 16px; font-size:12px; }
 
-  /* Summary cards */
-  .summary-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-                  gap:12px; margin-bottom:24px; }
-  .summary-card { background:#fff; border-radius:10px; padding:14px 12px; text-align:center;
-                  box-shadow:0 1px 4px rgba(0,0,0,.08); }
-  .summary-card .state-name { font-size:10px; color:#64748B; font-weight:700;
-                               text-transform:uppercase; letter-spacing:.6px; margin-bottom:6px; }
-  .summary-card .seats-filed { font-size:22px; font-weight:800; color:#1E293B; line-height:1; }
-  .summary-card .seats-total { font-size:11px; color:#94A3B8; margin-top:2px; }
-  .progress-bar { background:#E2E8F0; border-radius:4px; height:6px; margin-top:8px; overflow:hidden; }
-  .progress-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,#3B82F6,#6366F1); }
+  .state-block { background:#fff; border-radius:10px; margin-bottom:16px;
+                 box-shadow:0 1px 4px rgba(0,0,0,.08); overflow:hidden; }
+  .state-head  { padding:14px 16px 10px; border-bottom:1px solid #F1F5F9; }
+  .state-head h2 { margin:0 0 4px; font-size:15px; font-weight:700; }
+  .state-meta  { font-size:12px; color:#94A3B8; }
+  .track       { background:#E2E8F0; border-radius:3px; height:4px; margin-top:8px; }
+  .track-fill  { height:4px; border-radius:3px; background:#6366F1; }
 
-  /* State cards */
-  .state-card { background:#fff; border-radius:12px; margin-bottom:20px;
-                box-shadow:0 2px 8px rgba(0,0,0,.08); overflow:hidden; }
+  .party-row   { display:flex; align-items:center; padding:10px 16px;
+                 border-bottom:1px solid #F8FAFC; gap:10px; }
+  .party-row:last-child { border-bottom:none; }
+  .rank        { font-size:12px; font-weight:700; color:#94A3B8; width:18px;
+                 text-align:center; flex-shrink:0; }
+  .party-pill  { font-size:11px; font-weight:700; color:#fff; border-radius:4px;
+                 padding:3px 8px; white-space:nowrap; flex-shrink:0; min-width:44px;
+                 text-align:center; }
+  .bar-col     { flex:1; }
+  .bar-bg      { background:#F1F5F9; border-radius:3px; height:10px; overflow:hidden; }
+  .bar-fill    { height:10px; border-radius:3px; }
+  .counts      { display:flex; gap:6px; flex-shrink:0; align-items:center; }
+  .w           { background:#DCFCE7; color:#166534; border-radius:4px;
+                 padding:2px 8px; font-size:12px; font-weight:700; min-width:32px;
+                 text-align:center; }
+  .l           { background:#DBEAFE; color:#1E40AF; border-radius:4px;
+                 padding:2px 8px; font-size:12px; font-weight:700; min-width:32px;
+                 text-align:center; }
+  .legend      { display:flex; gap:12px; padding:8px 16px; background:#F8FAFC;
+                 border-top:1px solid #F1F5F9; }
+  .legend span { font-size:11px; color:#64748B; }
 
-  /* State header */
-  .state-header { padding:16px 20px 12px; border-bottom:2px solid #F1F5F9; }
-  .state-header-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
-  .state-header h2 { margin:0; font-size:17px; color:#0F172A; font-weight:800; }
-  .state-header .meta { font-size:12px; color:#94A3B8; }
-  .majority-info { font-size:11px; color:#7C3AED; font-weight:600;
-                   background:#F5F3FF; border-radius:4px; padding:2px 8px; }
+  .change-block { background:#fff; border-radius:10px; margin-bottom:16px;
+                  box-shadow:0 1px 4px rgba(0,0,0,.08); overflow:hidden; }
+  .change-head  { padding:12px 16px; background:#FFF7ED; border-bottom:1px solid #FED7AA;
+                  font-size:13px; font-weight:700; color:#92400E; }
+  .change-row   { display:flex; align-items:center; padding:10px 16px;
+                  border-bottom:1px solid #F8FAFC; gap:10px; }
+  .change-row:last-child { border-bottom:none; }
+  .c-state      { font-size:11px; color:#94A3B8; width:80px; flex-shrink:0; }
+  .c-party      { flex:1; font-size:13px; font-weight:600; }
+  .c-nums       { display:flex; gap:6px; }
+  .up           { color:#16A34A; font-weight:700; font-size:13px; }
+  .dn           { color:#DC2626; font-weight:700; font-size:13px; }
+  .nc           { color:#CBD5E1; font-size:13px; }
 
-  /* Top-3 podium strip */
-  .podium { display:flex; gap:8px; padding:0 0 4px; }
-  .podium-item { flex:1; border-radius:8px; padding:8px 10px; }
-  .podium-item .p-label { font-size:9px; font-weight:700; text-transform:uppercase;
-                          letter-spacing:.5px; opacity:.7; margin-bottom:2px; }
-  .podium-item .p-name { font-size:11px; font-weight:700; white-space:nowrap;
-                         overflow:hidden; text-overflow:ellipsis; }
-  .podium-item .p-seats { font-size:18px; font-weight:800; line-height:1.1; }
-  .podium-1 { background:#FFFBEB; border:1px solid #FDE68A; color:#92400E; }
-  .podium-2 { background:#F8FAFC; border:1px solid #E2E8F0; color:#334155; }
-  .podium-3 { background:#FFF7ED; border:1px solid #FED7AA; color:#7C2D12; }
-
-  /* Party table */
-  table { width:100%; border-collapse:collapse; }
-  thead th { background:#F8FAFC; padding:9px 14px; text-align:left;
-             font-size:10px; color:#64748B; font-weight:700; text-transform:uppercase;
-             letter-spacing:.6px; border-bottom:1px solid #E2E8F0; }
-  thead th.num { text-align:center; width:56px; }
-  thead th.bar-col { width:30%; }
-  tbody tr { border-bottom:1px solid #F8FAFC; }
-  tbody tr:last-child { border-bottom:none; }
-  tbody td { padding:9px 14px; font-size:12.5px; color:#334155; vertical-align:middle; }
-  tbody td.num { text-align:center; font-weight:700; }
-
-  /* Party row accent */
-  .party-accent { display:inline-block; width:3px; border-radius:2px;
-                  height:28px; vertical-align:middle; margin-right:10px; }
-  .party-name-wrap { display:inline-flex; align-items:center; }
-  .party-abbr { font-size:10px; font-weight:700; color:#64748B;
-                background:#F1F5F9; border-radius:3px; padding:1px 5px; margin-left:6px; }
-
-  /* Seat bar */
-  .seat-bar-wrap { padding-right:8px; }
-  .seat-bar-bg { background:#F1F5F9; border-radius:3px; height:8px; overflow:hidden; }
-  .seat-bar-fill { height:100%; border-radius:3px; }
-  .seat-count { font-size:11px; color:#64748B; margin-top:2px; }
-
-  /* Badges */
-  .won-badge     { background:#DCFCE7; color:#166534; border-radius:4px;
-                   padding:2px 8px; font-size:11px; font-weight:800; }
-  .leading-badge { background:#DBEAFE; color:#1E40AF; border-radius:4px;
-                   padding:2px 8px; font-size:11px; font-weight:800; }
-  .zero          { color:#CBD5E1; font-size:12px; }
-
-  /* Majority line row */
-  .majority-row td { padding:4px 14px; background:#F5F3FF; }
-  .majority-line { border-top:2px dashed #A78BFA; font-size:10px; color:#7C3AED;
-                   font-weight:700; text-align:center; padding-top:3px; letter-spacing:.3px; }
-
-  /* Diff table */
-  .diff-up   { color:#16A34A; font-weight:700; }
-  .diff-down { color:#DC2626; font-weight:700; }
-  .diff-table thead th { background:#FFF7ED; }
-  .change-row td { vertical-align:middle; }
-  .dot { display:inline-block; width:8px; height:8px; border-radius:50%;
-         margin-right:6px; vertical-align:middle; }
-
-  /* Footer */
-  .footer { text-align:center; padding:20px 0 8px; color:#94A3B8; font-size:12px; }
+  .divider { border:none; border-top:1px solid #E2E8F0; margin:20px 0; }
+  .section-label { font-size:11px; font-weight:700; color:#94A3B8; text-transform:uppercase;
+                   letter-spacing:.8px; margin:0 0 10px; }
+  .footer { text-align:center; padding:16px 0 4px; font-size:12px; color:#94A3B8; }
   .footer a { color:#6366F1; text-decoration:none; }
-  .section-title { font-size:12px; font-weight:700; color:#64748B; text-transform:uppercase;
-                   letter-spacing:.7px; margin:0 0 10px; }
 </style>
 """
 
 
-def _party_color(party_name: str) -> str:
+def _party_color(name: str) -> str:
     for abbr, color in PARTY_COLORS.items():
-        if abbr in party_name:
+        if abbr in name:
             return color
     return "#94A3B8"
 
 
-def _build_summary_cards(data: dict) -> str:
-    cards = ""
-    for state, parties in data.get("states", {}).items():
-        filed = sum(p["total"] for p in parties)
-        total = STATE_TOTALS.get(state, 1)
-        pct = min(int(filed / total * 100), 100)
-        cards += f"""
-        <div class="summary-card">
-          <div class="state-name">{state}</div>
-          <div class="seats-filed">{filed}</div>
-          <div class="seats-total">of {total} seats</div>
-          <div class="progress-bar"><div class="progress-fill" style="width:{pct}%"></div></div>
-        </div>"""
-    return f'<div class="summary-grid">{cards}</div>'
+def _abbr(name: str) -> str:
+    return name.split(" - ")[-1].strip() if " - " in name else name[:6]
 
 
-def _abbr(party_name: str) -> str:
-    if " - " in party_name:
-        return party_name.split(" - ")[-1].strip()
-    return ""
-
-
-def _build_podium(parties: list[dict]) -> str:
-    top = parties[:3]
-    podium_classes = ["podium-1", "podium-2", "podium-3"]
-    medals = ["🥇", "🥈", "🥉"]
-    items = ""
-    for i, p in enumerate(top):
-        abbr = _abbr(p["party"]) or p["party"][:12]
-        items += f"""
-        <div class="podium-item {podium_classes[i]}">
-          <div class="p-label">{medals[i]} #{i+1}</div>
-          <div class="p-name">{abbr}</div>
-          <div class="p-seats">{p['total']}</div>
-        </div>"""
-    return f'<div class="podium">{items}</div>'
-
-
-def _build_state_table(state: str, parties: list[dict]) -> str:
+def _build_state_block(state: str, parties: list[dict]) -> str:
     if not parties:
         return ""
-
     total_seats = STATE_TOTALS.get(state, 1)
-    majority = total_seats // 2 + 1
-    filed = sum(p["total"] for p in parties)
-    max_total = max((p["total"] for p in parties), default=1)
+    counted = sum(p["total"] for p in parties)
+    pct = min(int(counted / total_seats * 100), 100)
+    max_seats = max((p["total"] for p in parties), default=1)
 
-    majority_inserted = False
     rows = ""
     for i, p in enumerate(parties, 1):
-        # Insert majority line before the first party that falls below the majority mark
-        if not majority_inserted and p["total"] < majority and i > 1:
-            rows += f"""
-            <tr class="majority-row">
-              <td colspan="4">
-                <div class="majority-line">— Majority mark: {majority} seats —</div>
-              </td>
-            </tr>"""
-            majority_inserted = True
-
         color = _party_color(p["party"])
         abbr = _abbr(p["party"])
-        bar_pct = int(p["total"] / max_total * 100) if max_total else 0
-        won_cell    = f'<span class="won-badge">{p["won"]}</span>'     if p["won"]     else '<span class="zero">—</span>'
-        leading_cell = f'<span class="leading-badge">{p["leading"]}</span>' if p["leading"] else '<span class="zero">—</span>'
-
+        bar_w = int(p["total"] / max_seats * 100)
         rows += f"""
-        <tr>
-          <td>
-            <span class="party-name-wrap">
-              <span class="party-accent" style="background:{color}"></span>
-              {p['party'].split(' - ')[0] if ' - ' in p['party'] else p['party']}
-              {'<span class="party-abbr">' + abbr + '</span>' if abbr else ''}
-            </span>
-          </td>
-          <td class="bar-col seat-bar-wrap">
-            <div class="seat-bar-bg">
-              <div class="seat-bar-fill" style="width:{bar_pct}%;background:{color}aa"></div>
+        <div class="party-row">
+          <span class="rank">{i}</span>
+          <span class="party-pill" style="background:{color}">{abbr}</span>
+          <div class="bar-col">
+            <div class="bar-bg">
+              <div class="bar-fill" style="width:{bar_w}%;background:{color}55"></div>
             </div>
-            <div class="seat-count">{p['total']} seats</div>
-          </td>
-          <td class="num">{won_cell}</td>
-          <td class="num">{leading_cell}</td>
-        </tr>"""
-
-    podium_html = _build_podium(parties)
-    filed_pct = min(int(filed / total_seats * 100), 100)
+          </div>
+          <div class="counts">
+            <span class="w">{p['won']}</span>
+            <span class="l">{p['leading']}</span>
+          </div>
+        </div>"""
 
     return f"""
-    <div class="state-card">
-      <div class="state-header">
-        <div class="state-header-top">
-          <h2>{state}</h2>
-          <span class="majority-info">Majority: {majority}</span>
-        </div>
-        <div style="margin-bottom:10px">
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:#94A3B8;margin-bottom:4px">
-            <span>{filed} results in</span>
-            <span>{filed_pct}% of {total_seats} seats</span>
-          </div>
-          <div class="progress-bar" style="height:6px">
-            <div class="progress-fill" style="width:{filed_pct}%"></div>
-          </div>
-        </div>
-        {podium_html}
+    <div class="state-block">
+      <div class="state-head">
+        <h2>{state}</h2>
+        <div class="state-meta">{counted} of {total_seats} seats counted ({pct}%)</div>
+        <div class="track"><div class="track-fill" style="width:{pct}%"></div></div>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Party</th>
-            <th class="bar-col">Seats</th>
-            <th class="num">Won</th>
-            <th class="num">Leading</th>
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
-      </table>
+      {rows}
+      <div class="legend">
+        <span><b style="color:#166534">Won</b> &nbsp;·&nbsp; <b style="color:#1E40AF">Leading</b></span>
+      </div>
     </div>"""
 
 
-def _build_full_results_html(data: dict) -> str:
-    timestamp = data.get("timestamp", "")
-    cards = _build_summary_cards(data)
-    state_tables = "".join(
-        _build_state_table(state, parties)
+def _build_results_html(data: dict) -> str:
+    blocks = "".join(
+        _build_state_block(state, parties)
         for state, parties in data.get("states", {}).items()
         if parties
     )
+    ts = data.get("timestamp", "")
     return f"""
-    {cards}
-    <p class="section-title">State-wise Breakdown</p>
-    {state_tables}
-    <p style="color:#94A3B8;font-size:12px;margin-top:4px">{timestamp}</p>
+    <p class="section-label">State-wise Results</p>
+    {blocks}
+    <p style="font-size:11px;color:#CBD5E1;margin-top:4px">{ts}</p>
     """
 
 
@@ -289,41 +174,32 @@ def _build_diff_html(changes: list[dict]) -> str:
 
     rows = ""
     for c in changes:
-        def diff_cell(old, new, kind):
-            badge_cls = "won-badge" if kind == "won" else "leading-badge" if kind == "leading" else "total-badge"
+        def cell(old, new, label):
             if old == new:
-                return f'<td class="num"><span class="{badge_cls}">{new}</span></td>'
+                return f'<span class="nc">{label} {new}</span>'
             arrow = "▲" if new > old else "▼"
-            cls = "diff-up" if new > old else "diff-down"
-            return (
-                f'<td class="num"><span class="{badge_cls}">{new}</span> '
-                f'<span class="{cls}" style="font-size:11px">{arrow}{abs(new-old)}</span></td>'
-            )
+            cls = "up" if new > old else "dn"
+            return f'<span class="{cls}">{label} {new} {arrow}{abs(new - old)}</span>'
 
         color = _party_color(c["party"])
+        abbr = _abbr(c["party"])
         rows += f"""
-        <tr class="change-row">
-          <td style="font-size:12px;color:#64748B">{c['state']}</td>
-          <td><span class="dot" style="background:{color}"></span>{c['party']}</td>
-          {diff_cell(c['old'].get('won',0),    c['new'].get('won',0),    'won')}
-          {diff_cell(c['old'].get('leading',0), c['new'].get('leading',0), 'leading')}
-          {diff_cell(c['old'].get('total',0),  c['new'].get('total',0),  'total')}
-        </tr>"""
+        <div class="change-row">
+          <span class="c-state">{c['state']}</span>
+          <span class="party-pill" style="background:{color};font-size:10px">{abbr}</span>
+          <span class="c-party">{c['party'].split(' - ')[0] if ' - ' in c['party'] else c['party']}</span>
+          <div class="c-nums">
+            {cell(c['old'].get('won',0),     c['new'].get('won',0),     'W')}
+            {cell(c['old'].get('leading',0), c['new'].get('leading',0), 'L')}
+          </div>
+        </div>"""
 
     return f"""
-    <p class="section-title">What Changed</p>
-    <div class="state-card" style="margin-bottom:24px">
-      <table class="diff-table">
-        <thead>
-          <tr>
-            <th>State</th><th>Party</th>
-            <th class="num">Won</th><th class="num">Leading</th><th class="num">Total</th>
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
-      </table>
+    <div class="change-block">
+      <div class="change-head">&#128308; What changed</div>
+      {rows}
     </div>
-    <p class="section-title">Full Snapshot</p>
+    <hr class="divider">
     """
 
 
@@ -331,15 +207,13 @@ def _send(subject: str, html_content: str) -> None:
     body = f"""<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">{STYLES}</head>
-<body>
-<div class="wrapper">
+<body><div class="wrapper">
   {html_content}
   <div class="footer">
     <a href="https://results.eci.gov.in/ResultAcGenMay2026/index.htm">View on ECI Website</a>
     &nbsp;·&nbsp; Election Commission of India
   </div>
-</div>
-</body></html>"""
+</div></body></html>"""
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
@@ -356,24 +230,24 @@ def _send(subject: str, html_content: str) -> None:
 
 
 def send_alert(new_data: dict, changes: list[dict]) -> None:
-    timestamp = new_data.get("timestamp", "")
-    subject = f"[Election Alert] Results updated — {timestamp}"
+    ts = new_data.get("timestamp", "")
+    subject = f"[Election Alert] Results updated — {ts}"
     header = f"""
     <div class="header">
-      <h1>&#9889; Election Results Updated</h1>
-      <p>Seat counts have changed since the last check</p>
-      <span class="badge">&#128197; {timestamp}</span>
+      <h1>&#9889; Results Updated</h1>
+      <p class="sub">Seat counts have changed</p>
+      <span class="ts">&#128197; {ts}</span>
     </div>"""
-    _send(subject, header + _build_diff_html(changes) + _build_full_results_html(new_data))
+    _send(subject, header + _build_diff_html(changes) + _build_results_html(new_data))
 
 
 def send_digest(data: dict) -> None:
-    timestamp = data.get("timestamp", "")
-    subject = f"[Election Digest] Current results — {timestamp}"
+    ts = data.get("timestamp", "")
+    subject = f"[Election Digest] Current results — {ts}"
     header = f"""
     <div class="header">
-      <h1>&#128240; Election Results Digest</h1>
-      <p>Periodic snapshot of all constituency results</p>
-      <span class="badge">&#128197; {timestamp}</span>
+      <h1>&#128240; Election Results</h1>
+      <p class="sub">Periodic snapshot · May 2026</p>
+      <span class="ts">&#128197; {ts}</span>
     </div>"""
-    _send(subject, header + _build_full_results_html(data))
+    _send(subject, header + _build_results_html(data))
