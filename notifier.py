@@ -344,7 +344,7 @@ def _send(subject: str, html_content: str) -> None:
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = GMAIL_USER
-    msg["To"] = GMAIL_USER
+    msg["To"] = "undisclosed-recipients:;"
     msg["Bcc"] = ", ".join(RECIPIENTS)
     msg.attach(MIMEText(body, "html"))
 
